@@ -1,4 +1,4 @@
-import libxml from 'libxmljs';
+import xml2js from 'xml2js';
 let contracts = [
     {
         contract: '99324561'
@@ -22,8 +22,13 @@ const getInformation = (contract,contract_object) => {
             resp_code = "P9";
             setTimeout(function(){
                 const response = create_response(contract_object);
-                convertJsonToSoapXML(response);
-                const response_xml = convertJsonToSoapXML(response);
+                let builder = new xml2js.Builder();
+                let response_xml = builder.buildObject(response);
+                console.log("a ver si furula:");
+                console.log(response_xml);
+                console.log("se acabo");
+                // convertJsonToSoapXML(response);
+                // const response_xml = convertJsonToSoapXML(response);
                 reject(response_xml);
             },3000)
         }
@@ -31,16 +36,26 @@ const getInformation = (contract,contract_object) => {
             console.log("No tiene 8 digitos")
             resp_code = "P8";
             const response = create_response(contract_object);
-            convertJsonToSoapXML(response);
-            const response_xml = convertJsonToSoapXML(response);
+            let builder = new xml2js.Builder();
+            let response_xml = builder.buildObject(response);
+            console.log("a ver si furula:");
+            console.log(response_xml);
+            console.log("se acabo");
+            // convertJsonToSoapXML(response);
+            // const response_xml = convertJsonToSoapXML(response);
             reject(response_xml);
             // reject("El contrato es invalido");
         }
         else if(!contract.match(valid_values)) {
             resp_code = "P8";
             const response = create_response(contract_object);
-            convertJsonToSoapXML(response);
-            const response_xml = convertJsonToSoapXML(response);
+            let builder = new xml2js.Builder();
+            let response_xml = builder.buildObject(response);
+            console.log("a ver si furula:");
+            console.log(response_xml);
+            console.log("se acabo");
+            // convertJsonToSoapXML(response);
+            // const response_xml = convertJsonToSoapXML(response);
             reject(response_xml);
             // reject("El contrato debe ser numerico");
         }
@@ -58,8 +73,13 @@ const getInformation = (contract,contract_object) => {
             if(contract_exist) {
                 console.log("El contrato existe");
                 const response = create_response(contract_object);
-                convertJsonToSoapXML(response);
-                const response_xml = convertJsonToSoapXML(response);
+                let builder = new xml2js.Builder();
+                let response_xml = builder.buildObject(response);
+                console.log("a ver si furula:");
+                console.log(response_xml);
+                console.log("se acabo");
+                // convertJsonToSoapXML(response);
+                // const response_xml = convertJsonToSoapXML(response);
                 resolve(response_xml);
                 
             } else {
@@ -67,8 +87,14 @@ const getInformation = (contract,contract_object) => {
                 resp_code = "P7";
                 // reject("El contrato no esta registrado");
                 const response = create_response(contract_object);
-                convertJsonToSoapXML(response);
-                const response_xml = convertJsonToSoapXML(response);
+                let builder = new xml2js.Builder();
+                let response_xml = builder.buildObject(response);
+                console.log("a ver si furula:");
+                console.log(response_xml);
+                console.log("se acabo");
+                
+                // convertJsonToSoapXML(response);
+                // const response_xml = convertJsonToSoapXML(response);
                 reject(response_xml);
             }
         }
@@ -77,14 +103,14 @@ const getInformation = (contract,contract_object) => {
 }
 //Funcion que construye el response simulado de fenix
 const create_response = (json_object) => {
-    console.log("el contrato a analizar:",json_object);
+    // console.log("el contrato a analizar:",json_object);
     let [envelope] = Object.keys(json_object); 
     let envelope_object = json_object[envelope];
     let [attributes,header,body] = Object.keys(envelope_object); 
     modify_envelope_children(envelope_object,attributes,header);
-    console.log("Final1",json_object);
+    // console.log("Final1",json_object);
     modify_envelop_header(json_object['soapenv:envelope']["soapenv:Header"]);
-    console.log("Final2",json_object);
+    // console.log("Final2",json_object);
     let [envelope_latest_bill] = envelope_object[body]; //accedo al body de envelope
     delete_key_value_pair(envelope_latest_bill,'pos:contractInvoiceRequest');
     let body_temp = modify_envelop_body(envelope_object, body);
@@ -92,7 +118,7 @@ const create_response = (json_object) => {
     delete_key_value_pair(envelope_object,body);
     delete envelope_object[body];
     json_object['soapenv:envelope']['soapenv:body'] = body_temp;
-    console.log("Final3:",json_object['soapenv:envelope']['soapenv:body']);
+    // console.log("Final3:",json_object['soapenv:envelope']['soapenv:body']);
     //convertJsonToSoapXML(json_object);
     // console.log("el objeto terminado:",OBJtoXML(json_object));
     return json_object;
@@ -103,9 +129,9 @@ const create_response = (json_object) => {
 //Funcion que modifica el body para que contega la informacion de fenix
 const modify_envelop_body = (envelope_object,body) => {
     let [envelope_contract_invoice] = envelope_object[body]; //accedo al body de envelope
-    console.log("hanla pa ve:",envelope_contract_invoice);
+    // console.log("hanla pa ve:",envelope_contract_invoice);
     let envelope_contract_invoice_keys = Object.keys(envelope_contract_invoice);
-    console.log("las keys:",Object.keys(envelope_contract_invoice));
+    // console.log("las keys:",Object.keys(envelope_contract_invoice));
     let contract_array = envelope_contract_invoice[envelope_contract_invoice_keys[0]];
     let contract_object = contract_array[0];
     let [contract_object_key] = Object.keys(contract_object);
@@ -158,139 +184,7 @@ const modify_envelop_body = (envelope_object,body) => {
     
 }
 
-//Funcion para convertir JSON a XML SOAP
-const convertJsonToSoapXML = (json_response) => {
-    // console.log("json response:",json_response);
-    let [envelope_object_components] = Object.values(json_response);
-    // console.log("components",envelope_object_components); 
-    let components_keys = Object.keys(envelope_object_components);
-    let envelope_object_attributes = json_response['soapenv:envelope'][components_keys[0]];
-    let header_tag = components_keys[1];
-    let body_tag = components_keys[2];
-    let [envelope_object_header_children] = json_response['soapenv:envelope'][header_tag];
-    let message_header_tag = Object.keys(envelope_object_header_children)[0]
-    // console.log(envelope_object_header_children);
-    // console.log("eo attr:",envelope_object_attributes);
-    // console.log("eo header:", envelope_object_header_children[message_header_tag][0]);
-    let envelope_object_header_message =  envelope_object_header_children[message_header_tag][0];
-    // console.log("eo header attr:",envelope_object_header_message );
-    let header_message_keys = Object.keys(envelope_object_header_message);
-    // console.log("keys:",header_message_keys)
-    let envelope_object_header_message_attr = envelope_object_header_message[header_message_keys[0]];
-    // console.log("mis atributos",envelope_object_header_message_attr)
-    let tracking_message_tag = header_message_keys[1];
-    let tracking_message_tag_children_object= envelope_object_header_message[tracking_message_tag][0];
-    // console.log("holi",header_message_keys[1]);
-    // console.log("holi2:",tracking_message_tag_children_object );
-    let [message_id_tag,carrier_id_tag,user_id_tag,password_tag] =  Object.keys(tracking_message_tag_children_object);
-    let [message_id_value,carrier_id_value,user_id_value,password_value] =  Object.values(tracking_message_tag_children_object);
-    // console.log(message_id_tag);
-    // console.log(carrier_id_tag);
-    // console.log(user_id_tag);
-    // console.log(password_tag);
-    // console.log(password_value);
 
-
-    let [envelope_object_body_children] = json_response['soapenv:envelope'][body_tag];
-    // let [billdetails_tag] = Object.keys(envelope_object_body_children);
-    // console.log("esto es lo que quiero:",envelope_object_body_children);
-    let [envelope_object_body_children_keys] = Object.keys(envelope_object_body_children);
-    
-    if(resp_code === "00") {
-        let [contract_id_tag,invoice_id_tag, invoice_date_tag, invoice_amount_tag,payment_tag,trans_status_tag,resp_code_tag,resp_desc_tag,trans_id_tag,trans_ref_tag] = Object.keys(envelope_object_body_children[envelope_object_body_children_keys]);
-        let [contract_id_value,invoice_id_value, invoice_date_value, invoice_amount_value,payment_value,trans_status_value,resp_code_value,resp_desc_value,trans_id_value,trans_ref_value] = Object.values(envelope_object_body_children[envelope_object_body_children_keys]);
-         //let envelope_object_attributes_keys = Object.keys(envelope_object_attributes);
-        let doc = new libxml.Document()
-        doc.node('soapenv:envelope').attr(envelope_object_attributes)
-            .node(header_tag)
-                .node(message_header_tag).attr(envelope_object_header_message_attr)
-                    .node(tracking_message_tag)
-                        .node(message_id_tag,message_id_value[0])
-                    .parent()
-                        .node(carrier_id_tag,carrier_id_value[0])
-                    .parent()
-                        .node(user_id_tag,user_id_value[0])
-                    .parent()
-                        .node(password_tag,password_value[0])
-                    .parent()
-
-                .parent()
-            .parent()
-        .parent()
-            .node(body_tag)
-                .node(envelope_object_body_children_keys)
-                    .node(contract_id_tag,contract_id_value.toString())
-                .parent()
-                    .node(invoice_id_tag,invoice_id_value.toString())
-                .parent()
-                    .node(invoice_date_tag,invoice_date_value)
-                .parent()
-                    .node(invoice_amount_tag,invoice_amount_value.toString())
-                .parent()
-                    .node(payment_tag,payment_value)
-                .parent()
-                    .node(trans_status_tag,trans_status_value)
-                .parent()
-                    .node(resp_code_tag,resp_code_value.toString())
-                .parent()
-                    .node(resp_desc_tag,resp_desc_value)
-                .parent()
-                    .node(trans_id_tag,trans_id_value.toString())
-                .parent()
-                    .node(trans_ref_tag,trans_ref_value.toString())
-                .parent()
-
-            .parent()
-        .parent()
-        .parent()
-
-        console.log(doc.toString());
-        return doc.toString();
-    }
-    else if( resp_code==="P8" || resp_code === "P7" || resp_code === "P9") {
-        let [contract_id_tag,trans_status_tag,resp_code_tag,resp_desc_tag] = Object.keys(envelope_object_body_children[envelope_object_body_children_keys]);
-        let [contract_id_value,trans_status_value,resp_code_value,resp_desc_value] = Object.values(envelope_object_body_children[envelope_object_body_children_keys]);
-        let doc = new libxml.Document()
-        doc.node('soapenv:envelope').attr(envelope_object_attributes)
-            .node(header_tag)
-                .node(message_header_tag).attr(envelope_object_header_message_attr)
-                    .node(tracking_message_tag)
-                        .node(message_id_tag,message_id_value[0])
-                    .parent()
-                        .node(carrier_id_tag,carrier_id_value[0])
-                    .parent()
-                        .node(user_id_tag,user_id_value[0])
-                    .parent()
-                        .node(password_tag,password_value[0])
-                    .parent()
-
-                .parent()
-            .parent()
-        .parent()
-            .node(body_tag)
-                .node(envelope_object_body_children_keys)
-                    .node(contract_id_tag,contract_id_value.toString())
-                .parent()
-                    .node(trans_status_tag,trans_status_value)
-                .parent()
-                    .node(resp_code_tag,resp_code_value.toString())
-                .parent()
-                    .node(resp_desc_tag,resp_desc_value)
-                .parent()
-            .parent()
-        .parent()
-        .parent()
-
-        console.log(doc.toString());
-        return doc.toString();
-
-    }
-
-  
-        
-
-}
-   
 
 //Funcion que modifica el header para que contega la informacion de fenix
 const modify_envelop_header = (envelope_header) => {

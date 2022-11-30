@@ -1,5 +1,4 @@
-import libxml from 'libxmljs';
-
+import xml2js from 'xml2js';
 const processPayment = (payment_object) => {
 
     return new Promise((resolve,reject) => {
@@ -20,7 +19,12 @@ const processPayment = (payment_object) => {
             delete_key_value_pair(payment_object,body);
             payment_object['soapenv:envelope']['soapenv:body'] = body_temp;
             console.log("payment object:",payment_object);
-            let response_xml = convertJsonToSoapXML(payment_object);
+            let builder = new xml2js.Builder();
+            let response_xml = builder.buildObject(payment_object);
+            console.log("a ver si furula:");
+            console.log(response_xml);
+            console.log("se acabo");
+            // let response_xml = convertJsonToSoapXML(payment_object);
             resolve(response_xml);
         }
         else {
@@ -98,73 +102,73 @@ const modify_envelop_body = (envelope_object,body) => {
     
 }
 
-//Funcion para convertir JSON a XML SOAP
-const convertJsonToSoapXML = (json_response) => {
-    //console.log("json response:",json_response);
-    let [envelope_object_components] = Object.values(json_response);
-    // console.log("components",envelope_object_components); 
-    let components_keys = Object.keys(envelope_object_components);
-    let envelope_object_attributes = json_response['soapenv:envelope'][components_keys[0]];
-    let header_tag = components_keys[2];
-    let body_tag = components_keys[1];
-    let [envelope_object_header_children] = json_response['soapenv:envelope'][header_tag];
-    console.log(envelope_object_header_children);
-    let message_header_tag = Object.keys(envelope_object_header_children)[0]
-    // console.log("message header:",message_header_tag);
-    // console.log(envelope_object_header_children);
-    let envelope_object_header_message =  envelope_object_header_children[message_header_tag][0];
-    // console.log("envelope_object:",envelope_object_header_message);
-    let header_message_keys = Object.keys(envelope_object_header_message);
-    let envelope_object_header_message_attr = envelope_object_header_message[header_message_keys[0]];
-    // console.log("envelope_object attr:",envelope_object_header_message_attr);
-    let tracking_message_tag = header_message_keys[1];
-    let tracking_message_tag_children_object= envelope_object_header_message[tracking_message_tag][0];
-    let [message_id_tag,carrier_id_tag,user_id_tag,password_tag] =  Object.keys(tracking_message_tag_children_object);
-    let [message_id_value,carrier_id_value,user_id_value,password_value] =  Object.values(tracking_message_tag_children_object);
+// //Funcion para convertir JSON a XML SOAP
+// const convertJsonToSoapXML = (json_response) => {
+//     //console.log("json response:",json_response);
+//     let [envelope_object_components] = Object.values(json_response);
+//     // console.log("components",envelope_object_components); 
+//     let components_keys = Object.keys(envelope_object_components);
+//     let envelope_object_attributes = json_response['soapenv:envelope'][components_keys[0]];
+//     let header_tag = components_keys[2];
+//     let body_tag = components_keys[1];
+//     let [envelope_object_header_children] = json_response['soapenv:envelope'][header_tag];
+//     console.log(envelope_object_header_children);
+//     let message_header_tag = Object.keys(envelope_object_header_children)[0]
+//     // console.log("message header:",message_header_tag);
+//     // console.log(envelope_object_header_children);
+//     let envelope_object_header_message =  envelope_object_header_children[message_header_tag][0];
+//     // console.log("envelope_object:",envelope_object_header_message);
+//     let header_message_keys = Object.keys(envelope_object_header_message);
+//     let envelope_object_header_message_attr = envelope_object_header_message[header_message_keys[0]];
+//     // console.log("envelope_object attr:",envelope_object_header_message_attr);
+//     let tracking_message_tag = header_message_keys[1];
+//     let tracking_message_tag_children_object= envelope_object_header_message[tracking_message_tag][0];
+//     let [message_id_tag,carrier_id_tag,user_id_tag,password_tag] =  Object.keys(tracking_message_tag_children_object);
+//     let [message_id_value,carrier_id_value,user_id_value,password_value] =  Object.values(tracking_message_tag_children_object);
   
    
-    let [envelope_object_body_children] = json_response['soapenv:envelope'][body_tag];
-    let [paymentdetails_tag] = Object.keys(envelope_object_body_children);
-    // console.log(envelope_object_body_children[paymentdetails_tag]);
-    let [trans_status_tag,resp_code_tag, resp_description_tag, trans_id_tag,trans_ref_num_tag] = Object.keys(envelope_object_body_children[paymentdetails_tag]);
-    let [trans_status_value,resp_code_value, resp_description_value, trans_id_value,trans_ref_num_value] = Object.values(envelope_object_body_children[paymentdetails_tag]);
+//     let [envelope_object_body_children] = json_response['soapenv:envelope'][body_tag];
+//     let [paymentdetails_tag] = Object.keys(envelope_object_body_children);
+//     // console.log(envelope_object_body_children[paymentdetails_tag]);
+//     let [trans_status_tag,resp_code_tag, resp_description_tag, trans_id_tag,trans_ref_num_tag] = Object.keys(envelope_object_body_children[paymentdetails_tag]);
+//     let [trans_status_value,resp_code_value, resp_description_value, trans_id_value,trans_ref_num_value] = Object.values(envelope_object_body_children[paymentdetails_tag]);
 
-    //Creacion del XML
-    let doc = new libxml.Document();
-    doc.node('soapenv:envelope').attr(envelope_object_attributes)
-        .node(header_tag)
-            .node(message_header_tag).attr(envelope_object_header_message_attr)
-                .node(tracking_message_tag)
-                    .node(message_id_tag,message_id_value.toString())
-                .parent()
-                    .node(carrier_id_tag,carrier_id_value.toString())
-                .parent()
-                    .node(user_id_tag,user_id_value.toString())
-                .parent()
-                    .node(password_tag,password_value.toString())
-                .parent()
-            .parent()
-        .parent()
-    .parent()
-        .node(body_tag)
-            .node(paymentdetails_tag)
-                .node(trans_status_tag,trans_status_value.toString())
-            .parent()
-                .node(resp_code_tag,resp_code_value.toString())
-            .parent()
-                .node(resp_description_tag,resp_description_value.toString())
-            .parent()
-                .node(trans_id_tag,trans_id_value.toString())
-            .parent()
-                .node(trans_ref_num_tag,trans_ref_num_value.toString())
-            .parent()
-    .parent()
-    .parent()
+//     //Creacion del XML
+//     let doc = new libxml.Document();
+//     doc.node('soapenv:envelope').attr(envelope_object_attributes)
+//         .node(header_tag)
+//             .node(message_header_tag).attr(envelope_object_header_message_attr)
+//                 .node(tracking_message_tag)
+//                     .node(message_id_tag,message_id_value.toString())
+//                 .parent()
+//                     .node(carrier_id_tag,carrier_id_value.toString())
+//                 .parent()
+//                     .node(user_id_tag,user_id_value.toString())
+//                 .parent()
+//                     .node(password_tag,password_value.toString())
+//                 .parent()
+//             .parent()
+//         .parent()
+//     .parent()
+//         .node(body_tag)
+//             .node(paymentdetails_tag)
+//                 .node(trans_status_tag,trans_status_value.toString())
+//             .parent()
+//                 .node(resp_code_tag,resp_code_value.toString())
+//             .parent()
+//                 .node(resp_description_tag,resp_description_value.toString())
+//             .parent()
+//                 .node(trans_id_tag,trans_id_value.toString())
+//             .parent()
+//                 .node(trans_ref_num_tag,trans_ref_num_value.toString())
+//             .parent()
+//     .parent()
+//     .parent()
   
-    return doc.toString();
+//     return doc.toString();
         
 
-}
+// }
 
 
 export default processPayment

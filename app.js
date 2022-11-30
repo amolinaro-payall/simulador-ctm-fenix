@@ -1,7 +1,6 @@
 //Importar librerias necesarias
 import express from "express";
 import cors from "cors";
-import XMLParser from "fast-xml-parser"
 import xmlparser from 'express-xml-bodyparser';
 // import libxmljs from 'libxmljs';
 
