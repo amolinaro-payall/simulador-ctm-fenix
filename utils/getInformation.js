@@ -1,10 +1,10 @@
 import xml2js from 'xml2js';
 let contracts = [
     {
-        contract: '99324561'
+        contract: '99324561347'
     }, 
     {
-        contract: '48484848'
+        contract: '48484848484'
     }
 ]
 // let contract1 = '99324561';
@@ -32,7 +32,7 @@ const getInformation = (contract,contract_object) => {
                 reject(response_xml);
             },3000)
         }
-        else if(contract.length > 8 || contract.length < 8) {
+        else if(contract.length > 11 || contract.length < 11) {
             console.log("No tiene 8 digitos")
             resp_code = "P8";
             const response = create_response(contract_object);
@@ -143,37 +143,37 @@ const modify_envelop_body = (envelope_object,body) => {
     //delete envelope_contract_invoice['pos:getlatestbillrequest'];
     if(resp_code === "00") {
         add_key_value_pair(envelope_contract_invoice,"pos:contractInvoiceResponse",{
-            "contractID": contract_id, 
-            "invoiceID": 10, 
-            "invoiceGenerationDate": "dd/mm/yyyy",
-            "invoiceAmount":100,
-            "PaymentDueDate":"dd/mm/yyyy",
-            "transStatus":"1",
-            "respCode":resp_code,
-            "respDescription":"random description",
-            "transactionID":1459859,
-            "transRefNumber":484994})
+            "pos:contractID": contract_id,
+            "pos:invoiceID": 10,
+            "pos:invoiceGenerationDate": "dd/mm/yyyy",
+            "pos:invoiceAmount":100,
+            "pos:PaymentDueDate":"dd/mm/yyyy",
+            "pos:transStatus":"1",
+            "pos:respCode":resp_code,
+            "pos:respDescription":"random description",
+            "pos:transactionID":1459859,
+            "pos:transRefNumber":484994})
     }
     else if(resp_code === "P8"){
         add_key_value_pair(envelope_contract_invoice,"pos:contractInvoiceResponse",{
-            "contractID": contract_id, 
-            "transStatus":"0",
-            "respCode":resp_code,
-            "respDescription":"Contrato Invalido"})
+            "pos:contractID": contract_id,
+            "pos:transStatus":"0",
+            "pos:respCode":resp_code,
+            "pos:respDescription":"Contrato Invalido"})
     }
     else if(resp_code === "P7"){
             add_key_value_pair(envelope_contract_invoice,"pos:contractInvoiceResponse",{
-                "contractID": contract_id, 
-                "transStatus":"0",
-                "respCode":resp_code,
-                "respDescription":"El contrato no existe"})
+                "pos:contractID": contract_id,
+                "pos:transStatus":"0",
+                "pos:respCode":resp_code,
+                "pos:respDescription":"El contrato no existe"})
     }
     else {
         add_key_value_pair(envelope_contract_invoice,"pos:contractInvoiceResponse",{
-            "contractID": contract_id, 
-            "transStatus":"0",
-            "respCode":resp_code,
-            "respDescription":"Error de conexion"})
+            "pos:contractID": contract_id,
+            "pos:transStatus":"0",
+            "pos:respCode":resp_code,
+            "pos:respDescription":"Error de conexion"})
     }
 
    

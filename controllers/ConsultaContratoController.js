@@ -9,7 +9,7 @@ const Consulta_Contrato = (req,res) => {
     ContratoService(json_object)
     .then((response) => {
         console.log("status existente",response);
-        // res.header("Content-Type", "text/xml")
+         res.header("Content-Type", "text/xml")
         res.status(200).send(response);
     })
     .catch((response) => {

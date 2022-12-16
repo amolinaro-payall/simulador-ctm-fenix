@@ -88,12 +88,12 @@ const modify_envelop_body = (envelope_object,body) => {
     delete_key_value_pair(envelope_payment,envelope_payment_key);
     // console.log("ahora me interesa esto:",envelope_payment);
     // //delete envelope_payment['pos:getlatestbillrequest'];
-    add_key_value_pair(envelope_payment,"paymentResponse",{
-            "transStatus": 123456, 
-            "respCode": 106599, 
-            "respDescription": "random description",
-            "transactionID":100,
-            "transRefNumber":16569965})
+    add_key_value_pair(envelope_payment,"pos:paymentResponse",{
+            "pos:transStatus": 123456,
+            "pos:respCode": 106599,
+            "pos:respDescription": "random description",
+            "pos:transactionID":100,
+            "pos:transRefNumber":16569965})
     
     let body_temp = envelope_object[body];
     // console.log("body_temp:",body_temp);
