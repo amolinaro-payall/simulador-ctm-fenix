@@ -90,7 +90,7 @@ const modify_envelop_body = (envelope_object,body) => {
     // //delete envelope_payment['pos:getlatestbillrequest'];
     add_key_value_pair(envelope_payment,"pos:paymentResponse",{
             "pos:transStatus": 123456,
-            "pos:respCode": 106599,
+            "pos:respCode": "00",
             "pos:respDescription": "random description",
             "pos:transactionID":100,
             "pos:transRefNumber":16569965})

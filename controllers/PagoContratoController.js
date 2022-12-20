@@ -5,6 +5,7 @@ const Pago_Contrato = (req,res) => {
     PagoService(payment_object)
     .then((response) => {
         console.log("pago exitoso");
+        res.header("Content-Type", "text/xml")
         res.status(200).send(response);
     })
     .catch((response) => {
